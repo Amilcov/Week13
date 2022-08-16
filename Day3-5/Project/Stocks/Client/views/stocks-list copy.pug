@@ -1,0 +1,24 @@
+extends layout.pug 
+block content 
+  .py-2
+    a.btn.btn-success(ahref='/stock/add' role='button') Add Stock 
+  table.table.table-striped.table-hover 
+    thead.thead-dark
+      tr 
+        th(scope='col') Symbol
+        th(scope='col') Name 
+        th(scope='col') Year Listed
+        th(scope='col') Info 
+        th(scope='col') Numbers of Shares
+        th(scope='col') 
+    tbody  
+      div.stocks-container
+      each stock in stocks 
+        tr 
+          td= stock.symbol 
+          td= stock.name 
+          td= stock.yearListed 
+          td= stock.info 
+          td= (stock.nrShare)
+          td: a.btn.btn-primary(href=`/stock/${stock.id}` role='button') Details
+  script(src='/js/stocks-list.js')        

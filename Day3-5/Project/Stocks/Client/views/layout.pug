@@ -1,0 +1,29 @@
+doctype html
+html 
+  head 
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0, shrink-to-fit=no')
+    link(rel='stylesheet' type='text/css' href='style.css')
+    link(rel="stylesheet" href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css' 
+               integrity='sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh'
+               crossorigin='anonymous')
+    title Stocks - #{title}
+  body 
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.mt-0.pt-0
+      a.navbar-brand(href='/') Stocks
+      button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbarText' aria-controls='navbarText' aria-expanded='false' aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+      div.collapse.navbar-collapse#navbarText
+        ul.navbar-nav.mr-auto
+          li.nav-item: a.nav-link(href='/transactions') Transactions
+        if locals.authenticated
+          span.navbar-text.px-4 Welcome #{user.firstName}!
+          form.form-inline.pr-4(action='/logout' method='post')
+            button.btn.btn-sm.btn-warning(type='submit') Logout
+        else
+          span.navbar-text.px-4
+            a.btn.btn-sm.btn-dark.mr-2(href='/login') Login
+            a.btn.btn-sm.btn-dark(href='/register') Register
+    .container  
+      h2.py-2= title 
+      block content  
