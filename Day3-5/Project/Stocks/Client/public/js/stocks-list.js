@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async() => {
 
       token = localStorage.getItem("STOCKS_ACCESS_TOCKEN");
       userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
-
+  
       const res = await fetch('http://localhost:8081/stocks', {
            headers: {
             Authorization: `Bearer ${token}`

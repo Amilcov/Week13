@@ -1,3 +1,4 @@
+//let { setLogin, setName } = require('./var');
 
 const loginForm = document.querySelector('.login-form');
 loginForm.addEventListener('submit', async(e) => {
@@ -24,12 +25,23 @@ loginForm.addEventListener('submit', async(e) => {
         };
 
       
-        const {user: {id}, token } = await res.json();
+        const {user: {id}, token} = await res.json();
 
+        console.log('jjj');
         localStorage.setItem('STOCKS_CURRENT_USER_ID', id);
         localStorage.setItem('STOCKS_ACCSESS_TOKEN', token);
+        document.cookie = "isLogin=true;firstName=AdriX";
+        //setLogin(true);
+        //setName('Adri6');
+        // varHTML.setLogin(true);
+        // varHTML.setName(user.firstName);
+
+        
+        // console.log('setLogin3:', varHTML.getLogin());
 
         window.location.href = '/stocks';
+
+       
 
     } catch(err) {
         if(err.status >= 400 && err.status < 600) {
