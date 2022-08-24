@@ -1,0 +1,47 @@
+extends layout.pug
+block content 
+  .errors-container
+  .transaction-add 
+    form.add-transaction 
+      .form-group 
+        label(for="stockId") Stock: 
+        input.form-control(type="text" name="stockId" placeholder="Stock") 
+      .form-group 
+        label(for="action") Action: 
+        select
+          option(value='Buy') Buy
+          option(value='Sell') Sell 
+          option(value='Dividend') Dividend
+      .form-group
+        label(name="noShares") Number of Shares: 
+        input(type="number" step="0.01" name="noShares")
+      .form-group
+        label(name="price") Price of Share: 
+        input(type="number" step="0.01" name="price")  
+      .form-group
+        label(name="exchanged") Exchanged( Number of Shares x Price of Share): 
+        input(type="number" step="0.01" name="exchanged")
+      .form-group
+        label(name="fee") Fee: 
+        input(type="number" step="0.01" name="fee")
+      .form-group
+        label(name="totalCredit") Total Credit(Exchanged - Fee): 
+        input(type="number" step="0.01" name="totalCredit") 
+      .form-group
+        label(name="date") Date: 
+        input(type="date" name="date") 
+      .form-group
+        label(name="time") Time: 
+        input(type="time" name="time")   
+
+        
+         
+      button.btn.btn-primary(type="submit") Add   
+      a.btn.btn-warning.ml-2(href='/transactions') Cancel  
+    script(src="js/transaction-add.js")   
+
+
+
+
+
+        
