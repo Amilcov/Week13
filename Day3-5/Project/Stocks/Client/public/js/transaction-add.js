@@ -18,7 +18,7 @@ addForm.addEventListener('submit', async(e) => {
     body = {stockId, action, quantity, price, exchanged, fee, totalCredit, date, time};
      console.log('body:', body);
     try {
-      token = localStorage.getItem("STOCKS_ACCESS_TOCKEN");
+      token = localStorage.getItem("STOCKS_ACCESS_TOKEN");
       userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
       body.userId = userId;
 
@@ -39,7 +39,7 @@ addForm.addEventListener('submit', async(e) => {
          throw res;
        };
 
-       window.location('/transactions');
+       window.location.href = '/transactions';
 
     } catch(err) {
         if (err.status >= 400 && err.status < 600) {

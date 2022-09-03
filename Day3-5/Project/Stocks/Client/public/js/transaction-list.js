@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async() => {
   
     try {
 
-      token = localStorage.getItem("STOCKS_ACCESS_TOCKEN");
+      token = localStorage.getItem("STOCKS_ACCESS_TOKEN");
       userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
 
       const res = await fetch(`http://localhost:8081/users/${userId}/transactions`, {
@@ -19,10 +19,7 @@ document.addEventListener('DOMContentLoaded', async() => {
 
       const { transactions } = await res.json();
 
-
-
       const transactionsConatiner = document.querySelector('.transactions-container');
-
       
       const transactionsHTML = transactions.map (({id, stock, action, quantity, price, exchanged, fee, totalCredit , date, time}) => 
       {  
@@ -31,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async() => {
         totalCreditDisplayed = action === 'Buy' ?  "-" + totalCreditDisplayed : "+" + totalCreditDisplayed;
         const timeDisplayed = time.toLocaleString().substr(0,5);
         const feeDisplayed = fee == 0 ? '0' : fee;
+        console.log('kkk');
 
         return ` <tr class=${classAction} > 
              <td> ${stock.symbol} </td>
@@ -75,9 +73,31 @@ document.addEventListener('DOMContentLoaded', async() => {
         transactionsConatiner.innerHTML = transactionsTable;
 
     } catch(err) {
+       if(err.status >= 400 && err.status < 600) {
+          const errorsJSON = await err.json();
+          let errorsContainer = document.querySelector('.errors-container');
 
-     
+          let errorsHTML = [`
+            <div class="alert alert-danger">
+              Something went wrong. Please try again.
+            </div>
+          `];
+
+          const { errors } = errorsJSON;
+          if(errors && Array.isArray(errors)) {
+            errorsHTML = errors.map(message => `  
+              <div class="alert alert-danger">
+                ${message}
+              </div>
+
+            `);
+          };
+
+        } else {
+          alert('Something went wrong.Check your intenet connection and try again');
+        }
     }
+     
 
 });
 

@@ -32,7 +32,7 @@ registerForm.addEventListener('submit', async(e)=> {
     const  result= await res.json();
     const { user: {id}, token } = result;
     localStorage.setItem('STOCKS_CURRENT_USER_ID', id);
-    localStorage.setItem('STOCKS_TOKEN_ACCESS', token);
+    localStorage.setItem('STOCKS_ACCESS_TOKEN', token);
 
     
 

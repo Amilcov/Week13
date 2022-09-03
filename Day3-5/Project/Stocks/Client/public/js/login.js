@@ -1,4 +1,16 @@
-//let { setLogin, setName } = require('./var');
+const navBarText = document.querySelector('#navbarText');
+navBarText.innerHTML = `
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link" href="/transactions"> Transactions </a>
+    </li>
+  </ul>
+  <span class="navbar-text px-4">
+    <a class="btn btn-sm btn-dark mr-2" href='/login'> Login </a>
+    <a class="btn btn-sm btn-dark" href='/register'> Register </a>
+  </span>
+`;
+
 
 const loginForm = document.querySelector('.login-form');
 loginForm.addEventListener('submit', async(e) => {
@@ -21,27 +33,17 @@ loginForm.addEventListener('submit', async(e) => {
         });
 
         if(!res.ok) {
-            throw res;
+          throw res;
         };
 
-      
-        const {user: {id}, token} = await res.json();
+        const {user: {id, firstname}, token} = await res.json();
 
-        console.log('jjj');
         localStorage.setItem('STOCKS_CURRENT_USER_ID', id);
-        localStorage.setItem('STOCKS_ACCSESS_TOKEN', token);
-        document.cookie = "isLogin=true;firstName=AdriX";
-        //setLogin(true);
-        //setName('Adri6');
-        // varHTML.setLogin(true);
-        // varHTML.setName(user.firstName);
+        localStorage.setItem('STOCKS_ACCESS_TOKEN', token);
+        localStorage.setItem('STOCKS_FIRSTNAME', firstname);
 
-        
-        // console.log('setLogin3:', varHTML.getLogin());
-
-        window.location.href = '/stocks';
-
-       
+  
+        window.location.href = '/stock';
 
     } catch(err) {
         if(err.status >= 400 && err.status < 600) {
@@ -61,7 +63,7 @@ loginForm.addEventListener('submit', async(e) => {
                 ${message}
               </div>
 
-            `)
+            `);
           };
 
         } else {
