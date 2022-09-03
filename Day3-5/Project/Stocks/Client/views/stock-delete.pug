@@ -1,0 +1,12 @@
+extends layout.pug
+
+block content
+  h3#stockName
+  div.errors-container 
+  div(class='py-4')
+    p Proceed with deleting this stock?
+  div
+    button.delete-button(class='btn btn-danger' type='submit') Delete Stock
+    a(class='btn btn-warning ml-2' href=`/stock/${stockId}` role='button') Cancel
+  p.d-none#stockId= stockId  
+  script(src="/js/stock-delete.js")    
