@@ -15,6 +15,24 @@ app.use('/stock/add', (req, res) => {
     return res.render('stock-add', {title: "Add Stock"});
 });
 
+app.use('/stock/:stockId(\\d+)/transaction/:transactionId(\\d+)', (req, res) => {
+    const stockId = parseInt(req.params.stockId, 10);
+    const transactionId = parseInt(req.params.transactionId, 10);
+    return res.render('transaction-detail', {title: "Transaction Detail", stockId, transactionId});
+});
+
+app.use('/stock/:stockId(\\d+)/transaction/edit/:transactionId(\\d+)', (req, res) => {
+    const stockId = parseInt(req.params.stockId, 10);
+    const transactionId = parseInt(req.params.transactionId, 10);
+    return res.render('transaction-edit', {title: "Transaction edit", stockId, transactionId});
+});
+
+app.use('/stock/:stockId(\\d+)/transaction/delete/:transactionId(\\d+)', (req, res) => {
+    const stockId = parseInt(req.params.stockId, 10);
+    const transactionId = parseInt(req.params.transactionId, 10);
+    return res.render('transaction-delete', {title: "Transaction Delete", stockId, transactionId});
+});
+
 
 app.use('/stock/:id(\\d+)', (req, res) => {
     const stockId = parseInt(req.params.id, 10);
@@ -37,11 +55,39 @@ app.use('/stock', (req, res) => {
 });
 
 
-app.use('/transactions', (req, res) => {
-    return res.render('transaction-list', {title: "Transactions"});
+app.use('/users/:userId(\\d+)/transaction/add/', (req, res) => {
+    const userId = parseInt(req.params.userId, 10);
+    return res.render('transaction-add', {title: "Add Transactions", userId: userId});
 });
+
+app.use('/users/:userId(\\d+)/stock/:stockId(\\d+)/transaction/add/', (req, res) => {
+    const userId = parseInt(req.params.userId, 10);
+    const stockId = parseInt(req.params.stockId, 10);
+    return res.render('transaction-add', {title: "Add Transactions", userId, stockId});
+});
+
+app.use('/transaction/:id(\\d+)', (req, res) => {
+    const transactionId = parseInt(req.params.id, 10);
+    return res.render('transaction-detail', {title: "Transaction detail", transactionId: transactionId});
+});
+
+
 app.use('/transaction/add', (req, res) => {
     return res.render('transaction-add', {title: "Add Transactions"});
+});
+
+app.use('/transaction/edit/:id(\\d+)', (req, res) => {
+    const transactionId = parseInt(req.params.id, 10);
+    return res.render('transaction-edit', {title: "Transaction Edit", transactionId});
+});
+
+app.use('/transaction/delete/:id(\\d+)', (req, res) => {
+    const transactionId = parseInt(req.params.id, 10);
+    return res.render('transaction-delete', {title: "Transaction Delete", transactionId});
+});
+
+app.use('/transaction', (req, res) => {
+    return res.render('transaction-list', {title: "Transactions"});
 });
 
 app.use('/login',(req, res) => {
