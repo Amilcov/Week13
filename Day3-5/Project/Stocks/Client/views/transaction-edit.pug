@@ -1,9 +1,10 @@
 extends layout.pug
 block content 
-  #date.d-none
-    p#stockId= stockId
   .errors-container
-  form.add-form 
+  #date.d-none
+    p#transactionId= transactionId
+    p#stockId= stockId
+  form.edit-form 
     .form-group
       label(for="stockId") Stock: 
       select.form-control#optionStocks(name="stockId" required)
@@ -34,14 +35,14 @@ block content
 
     .form-group
       label(for="date") Date: 
-      input.mr-2#dateField(type="date" name="date" required) 
+      input.mr-2#date(type="date" name="date" required) 
 
       label(for="time") Time: 
-      input#timeField(type="time" name="time" required)   
+      input#time(type="time" name="time" required)   
 
-    button.btn.btn-primary(type="submit") Add   
+    button.btn.btn-primary(type="submit") Update Transaction  
     a.btn.btn-warning.ml-2#cancelButton(href='/transaction') Cancel  
-  script(src="/js/transaction-add.js")   
+  script(src="/js/transaction-edit.js")   
 
 
 

@@ -1,0 +1,8 @@
+extends layout.pug
+block content 
+  #date.d-none
+    p#transactionId= transactionId
+    p#stockId= stockId
+  div.errors-container 
+  div#transaction-container
+  script(src="/js/transaction-detail.js")   
