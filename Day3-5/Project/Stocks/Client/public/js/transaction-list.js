@@ -1,3 +1,8 @@
+const firstName = localStorage.getItem('STOCKS_FIRSTNAME');
+const firstNameContainer = document.querySelector('#firstName');
+firstNameContainer.innerHTML = `Welcome ${firstName}!`;
+
+
 document.addEventListener('DOMContentLoaded', async() => {
   
     try {
@@ -28,8 +33,7 @@ document.addEventListener('DOMContentLoaded', async() => {
         totalCreditDisplayed = action === 'Buy' ?  "-" + totalCreditDisplayed : "+" + totalCreditDisplayed;
         const timeDisplayed = time.toLocaleString().substr(0,5);
         const feeDisplayed = fee == 0 ? '0' : fee;
-        console.log('kkk');
-
+    
         return ` <tr class=${classAction} > 
              <td> ${stock.symbol} </td>
              <td> ${action} </td>
@@ -40,16 +44,13 @@ document.addEventListener('DOMContentLoaded', async() => {
              <td class="text-right bold"> ${totalCreditDisplayed} </td>
              <td> ${date} </td>
              <td> ${timeDisplayed} </td>
-             <td> <a class="btn btn-primary" href="/transactions/${id}" role="button"> Details </a> </td>
+             <td> <a class="btn btn-primary" href="/transaction/${id}" role="button"> Details </a> </td>
             </tr>  
          `
       
       });
       
-
-      console.log('transactionsHTML', transactionsHTML);
-
-       const transactionsTable = 
+      const transactionsTable = 
        `<table class="table table-striped table-hover">
           <thead class="thead-dark">
             <tr>
@@ -73,37 +74,43 @@ document.addEventListener('DOMContentLoaded', async() => {
         transactionsConatiner.innerHTML = transactionsTable;
 
     } catch(err) {
-       if(err.status >= 400 && err.status < 600) {
-          const errorsJSON = await err.json();
-          let errorsContainer = document.querySelector('.errors-container');
-
-          let errorsHTML = [`
-            <div class="alert alert-danger">
-              Something went wrong. Please try again.
-            </div>
-          `];
-
-          const { errors } = errorsJSON;
-          if(errors && Array.isArray(errors)) {
-            errorsHTML = errors.map(message => `  
-              <div class="alert alert-danger">
-                ${message}
-              </div>
-
-            `);
-          };
-
-        } else {
-          alert('Something went wrong.Check your intenet connection and try again');
-        }
+        handleError(err);
     }
      
 
 });
 
 
-
 function displayNum(num) {
   let numFormatted = num < 1000 ? num : parseInt(num / 1000, 10) + ',' + num.toString( parseInt(num / 1000, 10).toString().length );
   return numFormatted;
 };
+
+
+async function handleError(err) {
+   if (err.status >= 400 && err.status < 600) {
+
+        const errorsJSON = await err.json();
+        let errorsContainer = document.querySelector('.errors-container');
+        let errorsHTML = [`
+             <div class="alert alert-danger">
+                Something went wrong. Please try again.
+            </div>   
+        `];
+
+        const { errors }  = errorsJSON;
+       
+        if (errors && Array.isArray(errors)) {
+         errorsHTML = errors.map( err => `
+            <div class="alert alert-danger">
+                ${err}
+            </div>
+            `);
+        };
+
+        errorsContainer.innerHTML = errorsHTML.join("");
+
+    } else {
+        alert('Something went wrong. Check internety connection and try again.');
+    }
+}

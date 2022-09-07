@@ -4,12 +4,10 @@ const firstNameContainer = document.querySelector('#firstName');
 firstNameContainer.innerHTML = `Welcome ${firstName}!`;
 
 
-
 document.addEventListener('DOMContentLoaded', async() => {
   
     try {
 
-      console.log('js1');
       token = localStorage.getItem("STOCKS_ACCESS_TOKEN");
       userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
       const stockId = document.querySelector('#stockId').innerHTML;
@@ -74,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async() => {
              <td class="text-right bold"> ${totalCreditDisplayed} </td>
              <td> ${date} </td>
              <td> ${timeDisplayed} </td>
-             <td> <a class="btn btn-primary" href="/transactions/${id}" role="button"> Details </a> </td> 
+             <td> <a class="btn btn-primary" href="/stock/${stockId}/transaction/${id}" role="button"> Details </a> </td> 
             </tr>  
          `
       });
@@ -85,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async() => {
         `<div class="pt-3" "pb-5">
            <h3 class="py-2"> Transactions </h3>
            <div class="py-3">
-               <a class="btn btn-success" href="/users/${userId}/transaction/add" role="button">Add Transaction </a>
+               <a class="btn btn-success" href="/users/${userId}/stock/${stockId}/transaction/add" role="button">Add Transaction </a>
            </div>
 
            <table class="table table-striped table-hover">
@@ -109,40 +107,14 @@ document.addEventListener('DOMContentLoaded', async() => {
         +'</table>';
        // +'</div>';
 
-        
-
         transactionsConatiner.innerHTML = transactionsTable;
 
-
-        
+        if (transactionsHTML.length) document.querySelector('.btn-danger').classList.add('disabled');
 
     } catch(err) {
-        if(err.status >= 400 && err.status < 600) {
-          const errorsJSON = await err.json();
-          let errorsContainer = document.querySelector('.errors-container');
-
-          let errorsHTML = [`
-            <div class="alert alert-danger">
-              Something went wrong. Please try again.
-            </div>
-          `];
-
-          const { errors } = errorsJSON;
-          if(errors && Array.isArray(errors)) {
-            errorsHTML = errors.map(message => `  
-              <div class="alert alert-danger">
-                ${message}
-              </div>
-
-            `);
-          };
-
-        } else {
-          alert('Something went wrong.Check your intenet connection and try again');
-        }
+       handleError(err);
     }
      
-
 });
 
 
@@ -152,4 +124,31 @@ function displayNum(num) {
 };
 
 
+async function handleError(err) {
+   if (err.status >= 400 && err.status < 600) {
+
+        const errorsJSON = await err.json();
+        let errorsContainer = document.querySelector('.errors-container');
+        let errorsHTML = [`
+             <div class="alert alert-danger">
+                Something went wrong. Please try again.
+            </div>   
+        `];
+
+        const { errors }  = errorsJSON;
+       
+        if (errors && Array.isArray(errors)) {
+         errorsHTML = errors.map( err => `
+            <div class="alert alert-danger">
+                ${err}
+            </div>
+            `);
+        };
+
+        errorsContainer.innerHTML = errorsHTML.join("");
+
+    } else {
+        alert('Something went wrong. Check internety connection and try again.');
+    }
+}
 

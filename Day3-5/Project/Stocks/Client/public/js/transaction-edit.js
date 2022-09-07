@@ -1,78 +1,80 @@
+
 const firstName = localStorage.getItem('STOCKS_FIRSTNAME');
 const firstNameContainer = document.querySelector('#firstName');
 firstNameContainer.innerHTML = `Welcome ${firstName}!`;
 
-const addForm = document.querySelector('.add-form');
 
 token = localStorage.getItem("STOCKS_ACCESS_TOKEN");
 userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
 
+const transactionId = document.querySelector('#transactionId').innerHTML;
 const stockId = document.querySelector('#stockId').innerHTML;
+let stockIdFromTransaction;
+
 
 document.addEventListener('DOMContentLoaded', async(e) => {
-
     e.preventDefault();
-    setDateTime();
+   
     try {
-
-     let serverRouter = `http://localhost:8081/stock`;
-    
-      if (stockId) {
-        serverRouter = `http://localhost:8081/stock/${stockId}`;
-        document.querySelector('#cancelButton').setAttribute('href',`/stock/${stockId}`);
-      }
-
-      const res = await fetch(serverRouter, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                 Authorization: `Bearer ${token}`
-            }
+  
+     //get values 
+      const res = await fetch(`http://localhost:8081/transactions/${transactionId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       });
 
-       
-      if(!res.ok) {
-           throw res;
-      };
+       if(res.status === 401) {
+         window.location.href = '/login';
+       };
 
-      if(res.status === 401) {
-          window.location.href = '/login';
-          return;
-      };
+       if(!res.ok) {
+         throw res;
+       };
+
+       const { transaction } = await res.json();
+      
+       stockIdFromTransaction = transaction[0].stock.id;
+       let optionStocks = document.querySelector('#optionStocks');
+       let optionStocksHTML = ` <option value=${transaction[0].stock.id}> ${transaction[0].stock.symbol} - ${transaction[0].stock.name} </option>`;
+       optionStocks.innerHTML = "<select> <option> </option>" + optionStocksHTML+ "</select>";
+
+       let cancelButton = document.getElementById('cancelButton');
+       if(stockId) {
+        cancelButton.setAttribute('href', `/stock/${stockId}`);
+       };
+    
+
+       //set values
+       document.getElementsByName('stockId')[0].value = transaction[0].stock.id
+       document.getElementsByName('action')[0].value = transaction[0].action
+       document.getElementsByName('noShares')[0].value = transaction[0].quantity
+       document.getElementsByName('price')[0].value = transaction[0].price
+       document.getElementsByName('exchanged')[0].value = transaction[0].exchanged
+       document.getElementsByName('fee')[0].value = transaction[0].fee
+       document.getElementsByName('totalCredit')[0].value = transaction[0].totalCredit
+       document.getElementsByName('date')[0].value = transaction[0].date
+       document.getElementsByName('time')[0].value = transaction[0].time
 
 
-     let optionStocks = document.querySelector('#optionStocks');
-     let optionStocksHTML = '';
-     
-    if(stockId) {
-      const { stock } = await res.json();
-      optionStocksHTML =  `<option value=${stock.id}> ${stock.symbol} - ${stock.name} </option>`
-      optionStocks.innerHTML = optionStocksHTML;
 
-    } else {
-      const { stocks } = await res.json();
 
-      if (stocks && Array.isArray(stocks)) {
-         optionStocksHTML = stocks.map( stock => `
-             <option value=${stock.id}> ${stock.symbol} - ${stock.name} </option>
-          `);
-      };
-
-      optionStocks.innerHTML = "<select required> <option> </option>" + optionStocksHTML.join("") + "</select>";
-    }
 
     } catch(err) {
-       handleError(err);
+      handleError(err) 
+       
     };
+});
 
-  });
 
-
-addForm.addEventListener('submit', async(e) => {
+//update
+ const editForm = document.querySelector('.edit-form');
+ editForm.addEventListener('submit', async(e) => {
     e.preventDefault();
-    const formData = new FormData(addForm);
+    const formData = new FormData(editForm);
 
-    const stockIdForm = formData.get('stockId');
     const action = formData.get('action');
     const quantity = formData.get('noShares');
     const price = formData.get('price');
@@ -82,14 +84,16 @@ addForm.addEventListener('submit', async(e) => {
     const date = formData.get('date');
     const time = formData.get('time');
 
-    body = {stockId: stockIdForm, action, quantity, price, exchanged, fee, totalCredit, date, time};
-
+    
+    body = {userId, stockId: stockIdFromTransaction, action, quantity, price, exchanged, fee, totalCredit, date, time};
+    console.log('client transaction-edit body', body);
 
     try {
-    
-      body.userId = userId;
+      token = localStorage.getItem("STOCKS_ACCESS_TOKEN");
+      userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
 
-      const res = await fetch(`http://localhost:8081/users/${userId}/transaction/add`, {
+   
+      const res = await fetch(`http://localhost:8081/transactions/edit/${transactionId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -98,24 +102,23 @@ addForm.addEventListener('submit', async(e) => {
       body: JSON.stringify(body)
       });
 
-
-
        if(res.status === 401) {
-        window.location.href = '/login';
+         window.location.href = '/login';
        };
 
        if(!res.ok) {
          throw res;
        };
 
-      if (stockId) {
-        window.location.href = `/stock/${stockId}`;
-      } else {
-        window.location.href = '/transaction';
-      }
+       if (stockId) {
+          window.location.href = `/stock/${stockId}`;
+       } else {
+          window.location.href = '/transaction';
+       }
+
 
     } catch(err) {
-        handleError(err);
+       handleError(err) 
     };
 
 });
@@ -138,7 +141,6 @@ function handleDataInChange() {
 
 };
 
-
 const dataOut = document.querySelectorAll('.dataOut');
 dataOut.forEach(field => field.addEventListener('change', handleDataOutChange));
 
@@ -152,6 +154,10 @@ function handleDataOutChange() {
   };
 
 };
+
+
+
+
 
 
 async function handleError(err) {
@@ -184,10 +190,3 @@ async function handleError(err) {
 
 
 
-function setDateTime() {
-  let dateTime = new Date().toLocaleString('ro-RO');
-  let date = dateTime.substring(0, 10).split('.');
-
-  document.querySelector('#dateField').value = date.reverse().join('-');
-  document.querySelector('#timeField').value = dateTime.substring(12, 17);
-}

@@ -10,7 +10,7 @@ registerForm.addEventListener('submit', async(e)=> {
   const email = formData.get('email');
   const password = formData.get('password');
   const body = {firstname, lastname, username, email, password};
-  console.log('body', body)
+
 
   try {
  
@@ -22,8 +22,6 @@ registerForm.addEventListener('submit', async(e)=> {
       }
     });
 
-
-     console.log(res);
     
     if (!res.ok) {
         throw res;
@@ -39,8 +37,14 @@ registerForm.addEventListener('submit', async(e)=> {
     
 
   } catch(err) {
-    console.log('err:', err);
-      if(err.status >= 400 && err.status < 600) {
+      handleError(err) 
+  }
+
+})
+
+
+async function handleError(err) {
+  if(err.status >= 400 && err.status < 600) {
         
          const errorsJSON = await err.json();
          let errorsContainer = document.querySelector('.errors-container');
@@ -64,6 +68,5 @@ registerForm.addEventListener('submit', async(e)=> {
       } else {
         alert('Something went wrong.Check your intenet connection and try again');
       }
-  }
 
-})
+    }

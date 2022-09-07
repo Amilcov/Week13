@@ -12,6 +12,10 @@ navBarText.innerHTML = `
 `;
 
 
+localStorage.removeItem('STOCKS_CURRENT_USER_ID');
+localStorage.removeItem('STOCKS_ACCESS_TOKEN');
+localStorage.removeItem('STOCKS_FIRSTNAME');
+
 const loginForm = document.querySelector('.login-form');
 loginForm.addEventListener('submit', async(e) => {
     e.preventDefault();
@@ -46,29 +50,36 @@ loginForm.addEventListener('submit', async(e) => {
         window.location.href = '/stock';
 
     } catch(err) {
-        if(err.status >= 400 && err.status < 600) {
-          const errorsJSON = await err.json();
-          let errorsContainer = document.querySelector('.errors-container');
-
-          let errorsHTML = [`
-            <div class="alert alert-danger">
-              Something went wrong. Please try again.
-            </div>
-          `];
-
-          const { errors } = errorsJSON;
-          if(errors && Array.isArray(errors)) {
-            errorsHTML = errors.map(message => `  
-              <div class="alert alert-danger">
-                ${message}
-              </div>
-
-            `);
-          };
-
-        } else {
-          alert('Something went wrong.Check your intenet connection and try again');
-        }
+        handleError(err);
     }
 
-})
+});
+
+
+async function handleError(err) {
+   if (err.status >= 400 && err.status < 600) {
+        
+        const errorsJSON = await err.json();
+        let errorsContainer = document.querySelector('.errors-container');
+        let errorsHTML = [`
+             <div class="alert alert-danger">
+                Something went wrong. Please try again.
+            </div>   
+        `];
+
+        const { errors }  = errorsJSON;
+       
+        if (errors && Array.isArray(errors)) {
+         errorsHTML = errors.map( err => `
+            <div class="alert alert-danger">
+                ${err}
+            </div>
+            `);
+        };
+
+        errorsContainer.innerHTML = errorsHTML.join("");
+
+    } else {
+        alert('Something went wrong. Check internety connection and try again.');
+    }
+}

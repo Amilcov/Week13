@@ -45,32 +45,35 @@ addForm.addEventListener('submit', async(e) => {
        window.location.href = '/stock';
 
     } catch(err) {
-  
-        if (err.status >= 400 && err.status < 600) {
-
-           const errorsJSON = await err.json();
-           let errorsContainer = document.querySelector('.errors-container');
-           let errorsHTML = [`
-              <div class="alert alert-danger">
-                 Something went wrong. Please try again.
-              </div>   
-           `];
-
-           const { errors }  = errorsJSON;
-       
-           if (errors && Array.isArray(errors)) {
-             errorsHTML = errors.map( err => `
-               <div class="alert alert-danger">
-                  ${err}
-               </div>
-             `);
-           };
-
-           errorsContainer.innerHTML = errorsHTML.join("");
-
-        } else {
-          alert('Something went wrong. Check internety connection and try again.');
-        }
+       handleError(err);
     };
 
 });
+
+async function handleError(err) {
+   if (err.status >= 400 && err.status < 600) {
+
+        const errorsJSON = await err.json();
+        let errorsContainer = document.querySelector('.errors-container');
+        let errorsHTML = [`
+             <div class="alert alert-danger">
+                Something went wrong. Please try again.
+            </div>   
+        `];
+
+        const { errors }  = errorsJSON;
+       
+        if (errors && Array.isArray(errors)) {
+         errorsHTML = errors.map( err => `
+            <div class="alert alert-danger">
+                ${err}
+            </div>
+            `);
+        };
+
+        errorsContainer.innerHTML = errorsHTML.join("");
+
+    } else {
+        alert('Something went wrong. Check internety connection and try again.');
+    }
+}

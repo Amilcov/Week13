@@ -1,4 +1,3 @@
-const { handlerValidationErrors } = require("../../../Server/routes/utils");
 
 const firstName = localStorage.getItem('STOCKS_FIRSTNAME');
 const firstNameContainer = document.querySelector('#firstName');
@@ -11,13 +10,12 @@ userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
 
 document.addEventListener('DOMContentLoaded', async(e) => {
     e.preventDefault();
-
-    //1 get value
+   
     try {
       token = localStorage.getItem("STOCKS_ACCESS_TOKEN");
       userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
 
-   
+     //get values 
       const res = await fetch(`http://localhost:8081/stock/${stockId}`, {
       method: "GET",
       headers: {
@@ -35,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async(e) => {
        };
 
        const { stock } = await res.json();
-
+       //set values
        document.querySelector('#symbol').value = stock.symbol;
        document.querySelector('#name').value = stock.name;
        document.querySelector('#yearListed').value = stock.yearListed;
@@ -44,38 +42,13 @@ document.addEventListener('DOMContentLoaded', async(e) => {
        document.querySelector('#info').value = stock.info;
 
     } catch(err) {
-  
-        if (err.status >= 400 && err.status < 600) {
-
-           const errorsJSON = await err.json();
-           let errorsContainer = document.querySelector('.errors-container');
-           let errorsHTML = [`
-              <div class="alert alert-danger">
-                 Something went wrong. Please try again.
-              </div>   
-           `];
-
-           const { errors }  = errorsJSON;
+      handleError(err) 
        
-           if (errors && Array.isArray(errors)) {
-             errorsHTML = errors.map( err => `
-               <div class="alert alert-danger">
-                  ${err}
-               </div>
-             `);
-           };
-
-           errorsContainer.innerHTML = errorsHTML.join("");
-
-        } else {
-          alert('Something went wrong. Check internety connection and try again.');
-        }
     };
-
-
 });
 
 
+//update
  const editForm = document.querySelector('.edit-form');
  editForm.addEventListener('submit', async(e) => {
     e.preventDefault();
@@ -113,38 +86,44 @@ document.addEventListener('DOMContentLoaded', async(e) => {
          throw res;
        };
 
-    
-       window.location.href = '/stock';
+      if (stockId) {
+        window.location.href = `/stock/${stockId}`;
+      } else {
+        window.location.href = '/stock';
+      } 
 
     } catch(err) {
-  
-        if (err.status >= 400 && err.status < 600) {
-
-           const errorsJSON = await err.json();
-           let errorsContainer = document.querySelector('.errors-container');
-           let errorsHTML = [`
-              <div class="alert alert-danger">
-                 Something went wrong. Please try again.
-              </div>   
-           `];
-
-           const { errors }  = errorsJSON;
-       
-           if (errors && Array.isArray(errors)) {
-             errorsHTML = errors.map( err => `
-               <div class="alert alert-danger">
-                  ${err}
-               </div>
-             `);
-           };
-
-           errorsContainer.innerHTML = errorsHTML.join("");
-
-        } else {
-          alert('Something went wrong. Check internety connection and try again.');
-        }
+       handleError(err) 
     };
 
 });
 
 
+
+async function handleError(err) {
+   if (err.status >= 400 && err.status < 600) {
+
+        const errorsJSON = await err.json();
+        let errorsContainer = document.querySelector('.errors-container');
+        let errorsHTML = [`
+             <div class="alert alert-danger">
+                Something went wrong. Please try again.
+            </div>   
+        `];
+
+        const { errors }  = errorsJSON;
+       
+        if (errors && Array.isArray(errors)) {
+         errorsHTML = errors.map( err => `
+            <div class="alert alert-danger">
+                ${err}
+            </div>
+            `);
+        };
+
+        errorsContainer.innerHTML = errorsHTML.join("");
+
+    } else {
+        alert('Something went wrong. Check internety connection and try again.');
+    }
+}
