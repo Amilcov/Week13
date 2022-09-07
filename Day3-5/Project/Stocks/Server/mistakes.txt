@@ -113,3 +113,13 @@ OK:  (req, res, next)
 
     context: validationErrors - Orice validatre de errori se face cu next
 
+17.
+
+ OK:    script(src="/js/transaction-add.js")   
+!OK:   script(src="js/transaction-add.js")   
+
+
+18.
+
+ OK: label (for='x')
+!OK: label (name='x')

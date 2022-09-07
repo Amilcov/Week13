@@ -11,7 +11,7 @@ router.use(requireAuth);
 const transactionValidators = [
     check('stockId')
       .exists({checkFalsy: true})
-      .withMessage('Please provide a value for # Shares')
+      .withMessage('Please provide a value for Stock')
       .custom(value => {
         return db.Stock.findOne({where: {id: value}})
         .then(stock => {if (!stock) return Promise.reject('The provided stock does not exists')})
@@ -73,7 +73,6 @@ router.get('/users/:userId(\\d+)/transactions', asyncHandler( async(req, res, ne
 
 router.post('/users/:userId(\\d+)/transaction/add', transactionValidators, handlerValidationErrors, asyncHandler( async (req, res, next) => {
   
-  console.log('test');   
   const {stockId, action, quantity, price, exchanged, fee, totalCredit, date, time} = req.body;
   const userId = parseInt(req.params.userId, 10); 
   const transactionData = {userId, stockId, action, quantity, price, exchanged, fee, totalCredit, date, time};
@@ -82,9 +81,26 @@ router.post('/users/:userId(\\d+)/transaction/add', transactionValidators, handl
   return res.status(201).json({transaction, locals: {authenticated: true, firstName: 'Adri'}});
 }));
 
+router.post('/transactions/edit/:transactionId(\\d+)', 
+transactionValidators, handlerValidationErrors, asyncHandler(async (req, res) => {
+   const transactionId = parseInt(req.params.transactionId, 10);
+
+
+    if (req.errors) {
+      return res.status(404).json({"errors": req.errors});
+    } else {
+      const {userId, stockId, action, quantity, price, exchanged, fee, totalCredit, date, time} = req.body;
+      const transaction = {userId, stockId, action, quantity, price, exchanged, fee, totalCredit, date, time};
+     
+      const transactionToUpdate= await db.Transaction.findByPk(transactionId);
+      await transactionToUpdate.update(transaction);
+      
+      return res.status(200).json({transaction});
+  }
+
+}));
 
 router.get('/users/:userId(\\d+)/stocks/:stockId(\\d+)/transactions', asyncHandler( async(req, res, next) => {
-    console.log('jjj1');
     const userId = parseInt(req.params.userId, 10);
     const stockId = parseInt(req.params.stockId, 10);
 
@@ -98,9 +114,44 @@ router.get('/users/:userId(\\d+)/stocks/:stockId(\\d+)/transactions', asyncHandl
      }
     );
 
-    console.log('jjj3');
-    
     return res.json({ stock, transactions });
+}));
+
+
+router.get('/transactions/:transactionId(\\d+)', asyncHandler( async(req, res, next) => {
+    const transactionId = parseInt(req.params.transactionId, 10);
+    const transaction = await db.Transaction.findAll(
+       { where: {id: transactionId},
+         include: ['stock']
+      }
+    );
+     
+    if (transaction.userId == req.body.userId) {
+        return res.json({transaction});
+    } else {
+       return res.status(401).json({'message': "Transaction is visible just for user who made the transaction"})
+    }
+   
+   
+}));
+
+
+router.delete('/transaction/delete/:transactionId(\\d+)', 
+asyncHandler(async (req, res, next) => {
+
+  const transactionId = parseInt(req.params.transactionId, 10);
+  const transaction = await db.Transaction.findByPk(transactionId);
+
+  if (transaction) {
+      await transaction.destroy();
+      return res.status(204).end();
+  } else {
+       const err = new Error (`There isn\'t a transaction with id ${id} in the database`);
+       err.title = 'Transaction not found';
+       err.status = 404;
+       return next(err);
+  }
+
 }));
 
 

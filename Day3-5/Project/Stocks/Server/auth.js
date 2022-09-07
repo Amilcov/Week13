@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bearerToken = require('express-bearer-token');
-const db  = require('./db/models');
+const db = require('./db/models');
 const { secret, expiresIn } = require('./config').jwtConfig;
 
 
@@ -23,11 +23,10 @@ const restoreUser = (req, res, next) => {
  
     const { token } = req;
     if (!token) res.set('WWW-Authenticate', 'Bearer').status(401).end();
-
+      
     return jwt.verify(token, secret, null, async(err, jwtPayload) => {
 
       if (err) {
-        console.log('err token extragere');
         err.status = 401;
         return next(err);
       };

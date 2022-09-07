@@ -13,7 +13,6 @@ router.use(requireAuth);
 router.get('/', asyncHandler(async (req, res) => {
   const stocks = await db.Stock.findAll() ;
   res.json({stocks});
-
 }));
 
 
@@ -46,7 +45,7 @@ const stockValidators = [
 
 
 router.post('/', stockValidators, handlerValidationErrors, asyncHandler(async (req, res) => {
- 
+
   if (req.errors) {
      return res.status(404).json({"errors": req.errors});
   } else {
@@ -62,7 +61,6 @@ router.post('/', stockValidators, handlerValidationErrors, asyncHandler(async (r
 router.post('/edit/:stockId(\\d+)', 
 stockValidators, handlerValidationErrors, asyncHandler(async (req, res) => {
  
-
    const stockId = parseInt(req.params.stockId, 10);
 
     if (req.errors) {
@@ -80,9 +78,9 @@ stockValidators, handlerValidationErrors, asyncHandler(async (req, res) => {
 }));
 
 router.get('/:stockId(\\d+)', asyncHandler(async (req, res) => {
-  console.log('here - stock id');
   const stockId = parseInt(req.params.stockId, 10);
   const stock = await db.Stock.findByPk(stockId);
+
   return res.status(200).json({stock});
 }));
 
@@ -98,8 +96,8 @@ const stock = await db.Stock.findByPk(stockId);
       await stock.destroy();
       return res.status(204).end();
   } else {
-       const err = new Error (`There isn\'t a tweet with id ${id} in the database`);
-       err.title = 'Tweet not found';
+       const err = new Error (`There isn\'t a stock with id ${id} in the database`);
+       err.title = 'Stock not found';
        err.status = 404;
        return next(err);
   }

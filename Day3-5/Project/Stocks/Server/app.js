@@ -45,22 +45,39 @@ app.use((err, req, res, next) => {
   }
  });
 
+ 
  //Generic error handler;
  app.use((err, req, res, next) => {
-   res.status = err.status || 500;  
-   res.json({
-     "title": err.title || "Server Error",
-      "message": err.message,
-      "errors": err.errors,
-      "stack": isProduction ? null : err.stack
-    })
+     
+      res.status(err.status || 500);
 
-    if (res.statusCode !== 404) {
-      const err = new Error('Internal Server Error');
-      err.statusCode = 500;
-      res.json({"":""})
-    }
+      // res.json({
+      //    errors: { message: err.message },
+      // });
+
+      res.json(err)
+
+   
+    // res.status = err.status || 500;  
+    // res.json({
+    //   "title": err.title || "Server Error",
+    //   "message": err.message,
+    //   "errors": err.errors,
+    //   "stack": isProduction ? null : err.stack
+    // });
+  
+   
+      if (res.statusCode !== 404) {
+        const err = new Error('Internal Server Error');
+        err.statusCode = 500;
+        res.json({"":""})
+      }
+
+    
+    
  });
+
+ 
 
 
 module.exports = app;
