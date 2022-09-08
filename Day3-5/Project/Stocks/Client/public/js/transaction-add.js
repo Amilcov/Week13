@@ -125,6 +125,7 @@ const dataIn = document.querySelectorAll('.dataIn');
 dataIn.forEach(field => field.addEventListener('change', handleDataInChange));
 
 function handleDataInChange() {
+  const actionField = document.querySelector('[name="action"]').value;
   const noSharesField = document.querySelector('[name="noShares"]');
   const priceField = document.querySelector('[name="price"]');  
   const exchangedField = document.querySelector('[name="exchanged"]');
@@ -132,27 +133,28 @@ function handleDataInChange() {
   const totalField = document.querySelector('[name="totalCredit"]');
 
   if (noSharesField.value && priceField.value) {
+      const action = actionField === 'Buy' ? -1 : 1;
       exchangedField.value = (noSharesField.value * priceField.value).toFixed(6);
-      totalField.value = (exchangedField.value - feeField.value).toFixed(6);
+      totalField.value = (exchangedField.value - feeField.value * action).toFixed(6);
   };
 
 };
-
 
 const dataOut = document.querySelectorAll('.dataOut');
 dataOut.forEach(field => field.addEventListener('change', handleDataOutChange));
 
 function handleDataOutChange() {
+  const actionField = document.querySelector('[name="action"]').value;
   const exchangedField = document.querySelector('[name="exchanged"]');
   const feeField = document.querySelector('[name="fee"]');
   const totalField = document.querySelector('[name="totalCredit"]');
 
   if (exchangedField.value && feeField.value) {
-        totalField.value = (exchangedField.value - feeField.value).toFixed(6);
+        const action = actionField === 'Buy' ? -1 : 1;
+        totalField.value = (exchangedField.value - feeField.value * action).toFixed(6);
   };
 
 };
-
 
 async function handleError(err) {
    if (err.status >= 400 && err.status < 600) {
