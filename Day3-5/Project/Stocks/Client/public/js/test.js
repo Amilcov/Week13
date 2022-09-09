@@ -51,6 +51,7 @@ async function processData() {
        if (!chartData.hasOwnProperty(stockName)) {
         chartData[stockName] = {
             name: '', 
+            symbol: '',
             BuyTotalTransitStock: 0,
             BuyTotalTransitSum: 0,
             SellTotalTransitStock: 0,
@@ -61,6 +62,7 @@ async function processData() {
        } 
 
         chartData[stockName].name = data[i].name;
+        chartData[stockName].symbol = data[i].symbol;
         chartData[stockName].action = data[i].action;
         chartData[stockName][stockNo] = Number.parseFloat(data[i].TotalTransitStock).toFixed(2);
         chartData[stockName][stockvalue] = Number.parseFloat(data[i].TotalTransitSum).toFixed(2);
@@ -127,28 +129,47 @@ async function displayTable(){
   
       
     let stocksHTML = '';
+    let totalActiveValue = 0;
+    let totalDivident = 0;
+
     for (let i = 0; i < Object.keys(chartData).length; i++){
          let stockName = Object.keys(chartData)[i];
+         let activeNo = Number.parseFloat(chartData[stockName].BuyTotalTransitStock - chartData[stockName].SellTotalTransitStock).toFixed(2);
          let activeVal = Number.parseFloat(chartData[stockName].BuyTotalTransitSum - chartData[stockName].SellTotalTransitSum).toFixed(2);
-         
-         console.log('for: ', stockName);
-          stocksHTML += 
+         let dividend = Number.parseFloat(chartData[stockName].DividendTotalTransitSum).toFixed(2);
+
+         totalActiveValue += Number.parseFloat(activeVal);
+         totalDivident += Number.parseFloat(dividend);
+
+         console.log('td',totalDivident);
+         stocksHTML += 
             ` <tr> 
-               <td> ${stockName} </td>
-               <td> ${displayNum(chartData[stockName].BuyTotalTransitStock)} </td>
-               <td> ${chartData[stockName].SellTotalTransitStock} </td>
-               <td> ${displayNum(chartData[stockName].BuyTotalTransitStock - chartData[stockName].SellTotalTransitStock)} </td>          
-               <td> ${chartData[stockName].BuyTotalTransitSum} </td>
-               <td> ${chartData[stockName].SellTotalTransitSum} </td>
-               <td class="text-right"> ${displayNum(activeVal)} </td>
-               <td class="text-right"> ${(chartData[stockName].DividendTotalTransitSum).toLocaleString('en-US')} </td>    
+               <td class="bold"> ${chartData[stockName].symbol} </td>
+               <td class="text-right buy"> ${displayNum(chartData[stockName].BuyTotalTransitStock)} </td>
+               <td class="text-right sell"> ${chartData[stockName].SellTotalTransitStock} </td>
+               <td class="text-right bold"> ${displayNum(activeNo)} </td>          
+               <td class="text-right buy"> ${displayNum(chartData[stockName].BuyTotalTransitSum)} </td>
+               <td class="text-right sell"> ${displayNum(chartData[stockName].SellTotalTransitSum)} </td>
+               <td class="text-right bold"> ${displayNum(activeVal)} </td>
+               <td class="text-right dividend"> ${displayNum(dividend)} </td>    
              `
     };
   
+    let totalHTML = 
+      ` <tr>
+          <td class="bold" colspan="6" align="center"> TOTAL </td>
+          <td class="text-right bold"> ${displayNum(Number.parseFloat(totalActiveValue).toFixed(2))}</td>
+          <td class="text-right bold dividend" > ${displayNum(Number.parseFloat(totalDivident).toFixed(2))} </td>
+        </tr>
 
+        <tr>
+          <td class="bold" colspan="7" align="right"> TOTAL </td>
+          <td class="text-right bold"> ${displayNum(Number.parseFloat((totalActiveValue + totalDivident)).toFixed(2))}</td>
+        </tr>
+      `;
     const stocksTable = 
-       `<table class="table table-striped table-hover">
-          <thead class="thead-dark">
+       `<table class="table table-striped table-bordered" width="auto">
+          <thead class="thead-light">
             <tr>
              <th> Stock </th>
              <th> Buy - #Stock </th>
@@ -159,10 +180,12 @@ async function displayTable(){
              <th> Active - Value Stock </th>
              <th> Dividends </th>
             </tr> 
+            
           </thead>   
          <tbody>`
         +'</tbody>'
              + stocksHTML
+             +totalHTML
         +'</table>';
     const stocksConatiner = document.querySelector('.table-container');
     stocksConatiner.innerHTML = stocksTable;
@@ -171,13 +194,14 @@ async function displayTable(){
 
 
 function displayNum(num) {
-   return num.toLocaleString('en-US');
+  let result =  num.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+  return result;
 };
 
 
 
 async function handleError(err) {
-    console.log('errr', err);
+
    if (err.status >= 400 && err.status < 600) {
 
         const errorsJSON = await err.json();
@@ -189,7 +213,7 @@ async function handleError(err) {
         `];
 
         const { errors }  = errorsJSON;
-       console.log('errrrrr', errorsJSON);
+   
         if (errors && Array.isArray(errors)) {
          errorsHTML = errors.map( err => `
             <div class="alert alert-danger">
