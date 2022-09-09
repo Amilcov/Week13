@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async() => {
 
          return ` <tr class=${classAction} >  
              <td> ${stock[0].symbol} </td> 
-             <td class="sell"> ${action} </td> 
+             <td> ${action} </td> 
              <td> ${quantity} </td>
              <td class="text-right"> ${displayNum(price)} </td> 
              <td class="text-right"> ${displayNum(exchanged)} </td>
