@@ -2,20 +2,253 @@ const firstName = localStorage.getItem('STOCKS_FIRSTNAME');
 const firstNameContainer = document.querySelector('#firstName');
 firstNameContainer.innerHTML = `Welcome ${firstName}!`;
 
+const token = localStorage.getItem("STOCKS_ACCESS_TOKEN");
+const userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
 
-token = localStorage.getItem("STOCKS_ACCESS_TOKEN");
-userId = localStorage.getItem("STOCKS_CURRENT_USER_ID");
+let data = [];
+let chartData = {};
 
-document.addEventListener('DOMContentLoaded', async (e) => {
-  e.preventDefault();
+document.addEventListener('DOMContentLoaded', async() => {
+   try{
+       await getData();
+       await processData();
+       displayTable();
+       displayBarChartGeneral();
+       displayBarChart() 
+       console.log('chartData - main', chartData);
+   } catch (err) {
+       handleError();
+   }
+});
 
-  displayTableTotalGeneral()
 
-  const info = document.querySelector('#info');
-  info.innerHTML = 'Total Buy:'
+async function getData(){
+      
+    const res = await fetch(`http://localhost:8081/analytics/users/${userId}/info`, {
+        headers: {
+           Authorization: `Bearer ${token}`
+        }
+      });
 
+    if(res.status === 401) {
+        window.location.href = '/login';
+        return;
+    };
+
+    const { results } = await res.json();
+    data = results;
+};
+
+
+async function processData() {
+    for (let i = 0; i < data.length; i++) {
+        const stockName = data[i].name;
+        const stockNo = data[i].action + 'TotalTransitStock';
+        const stockvalue = data[i].action + 'TotalTransitSum';
+
+       if (!chartData.hasOwnProperty(stockName)) {
+        chartData[stockName] = {
+            name: '', 
+            symbol: '',
+            BuyTotalTransitStock: 0,
+            BuyTotalTransitSum: 0,
+            SellTotalTransitStock: 0,
+            SellTotalTransitSum: 0,
+            DividendTotalTransitStock: 0,
+            DividendTotalTransitSum: 0
+        };
+       } 
+
+        chartData[stockName].name = data[i].name;
+        chartData[stockName].symbol = data[i].symbol;
+        chartData[stockName].action = data[i].action;
+        chartData[stockName][stockNo] = Number.parseFloat(data[i].TotalTransitStock).toFixed(2);
+        chartData[stockName][stockvalue] = Number.parseFloat(data[i].TotalTransitSum).toFixed(2);
+    };
+};
+
+
+
+async function displayTable(){
+     
+    //
+    let stocksHTML = '';
+    let totalActiveValue = 0;
+    let totalDivident = 0;
+
+    for (let i = 0; i < Object.keys(chartData).length; i++){
+         let stockName = Object.keys(chartData)[i];
+         let activeNo = Number.parseFloat(chartData[stockName].BuyTotalTransitStock - chartData[stockName].SellTotalTransitStock).toFixed(2);
+         let activeVal = Number.parseFloat(chartData[stockName].BuyTotalTransitSum - chartData[stockName].SellTotalTransitSum).toFixed(2);
+         let dividend = Number.parseFloat(chartData[stockName].DividendTotalTransitSum).toFixed(2);
+
+         totalActiveValue += Number.parseFloat(activeVal);
+         totalDivident += Number.parseFloat(dividend);
+
+         console.log('td',totalDivident);
+         stocksHTML += 
+            ` <tr> 
+               <td class="bold"> ${chartData[stockName].symbol} </td>
+               <td class="text-right buy"> ${displayNum(chartData[stockName].BuyTotalTransitStock)} </td>
+               <td class="text-right sell"> ${chartData[stockName].SellTotalTransitStock} </td>
+               <td class="text-right bold"> ${displayNum(activeNo)} </td>          
+               <td class="text-right buy"> ${displayNum(chartData[stockName].BuyTotalTransitSum)} </td>
+               <td class="text-right sell"> ${displayNum(chartData[stockName].SellTotalTransitSum)} </td>
+               <td class="text-right bold"> ${displayNum(activeVal)} </td>
+               <td class="text-right dividend"> ${displayNum(dividend)} </td>    
+             `
+    };
   
+    let totalHTML = 
+      ` <tr>
+          <td class="bold" colspan="6" align="center"> TOTAL </td>
+          <td class="text-right bold"> ${displayNum(Number.parseFloat(totalActiveValue).toFixed(2))}</td>
+          <td class="text-right bold dividend" > ${displayNum(Number.parseFloat(totalDivident).toFixed(2))} </td>
+        </tr>
 
+        <tr>
+          <td class="bold" colspan="7" align="right"> TOTAL </td>
+          <td class="text-right bold"> ${displayNum(Number.parseFloat((totalActiveValue + totalDivident)).toFixed(2))}</td>
+        </tr>
+      `;
+    const stocksTable = 
+       `<table class="table table-striped table-bordered" width="auto">
+          <thead class="thead-light">
+            <tr align="center">
+             <th rowspan="2" style="vertical-align:top"> Stock </th>
+             <th colspan="3"> #Stock </th>
+             <th colspan="3"> Value Stock </th>
+             <th rowspan="2" style="vertical-align:top"> Dividends </th>
+            </tr> 
+            <tr align="center">
+             <th> Buy </th>
+             <th> Sell </th>
+             <th> Active </th>
+             <th> Buy </th>
+             <th> Sell </th>
+             <th> Active </th>
+            </tr> 
+          </thead>   
+         <tbody>`
+        +'</tbody>'
+             + stocksHTML
+             +totalHTML
+        +'</table>';
+    const stocksConatiner = document.querySelector('.table-container');
+    stocksConatiner.innerHTML = stocksTable;
+
+};
+
+
+
+
+//--
+async function displayBarChartGeneral() {
+  //1
+  const canvas0= document.querySelector('#canvas0');
+  canvas0.innerHTML= `<canvas id="myChart0" width="1600" height="900"></canvas>`;
+
+  //x-axis
+  var stocks = Object.keys(chartData);
+  var labelAction = ['Buy', 'Sell', 'Active'];
+
+  const buyStocks = [];
+  const sellStocks = [];
+  const activeStocks = [];
+  const dividends = [];
+
+  Object.entries(chartData).map( objStock => {
+    const buy = Number.parseFloat(objStock[1].BuyTotalTransitStock).toFixed(2);
+    const sell = Number.parseFloat(objStock[1].SellTotalTransitStock).toFixed(2);
+    const active = Number.parseFloat(buy - sell).toFixed(2);
+    const dividend = Number.parseFloat(objStock[1].DividendTotalTransitStock);
+
+    buyStocks.push(buy);
+    sellStocks.push(sell);
+    activeStocks.push(active);
+    dividends.push(dividend);
+});
+
+  var ctx0 = document.getElementById("myChart0");
+  var myChart0 = new Chart(ctx0, {
+
+    type: 'bar',
+    data: {
+            labels: stocks,
+            datasets: [
+              {
+                data: buyStocks,
+                label: ['Buy'],
+                backgroundColor: "green"
+              }, 
+              {
+                data: sellStocks,
+                label: ['Sell'],
+                backgroundColor: "#8a2be2",//["blue", "red"],
+              },
+
+              {
+                data: dividends,
+                label: ['Divident'],
+                backgroundColor: "#0fede2",//["blue", "red"],
+              },
+              {
+                data: activeStocks,
+                label: 'Active',
+                backgroundColor: "pink"//["#0fede2" ,"#0fede2", "#0fede2", "#0fede2", "#0fede2", "#0fede2","#0fede2", ],
+              }
+
+
+          ],
+  
+    }
+
+  });
+}
+
+//------
+
+function displayNum(num) {
+  let result =  num.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+  return result;
+};
+
+
+
+async function handleError(err) {
+
+   if (err.status >= 400 && err.status < 600) {
+
+        const errorsJSON = await err.json();
+        let errorsContainer = document.querySelector('.errors-container');
+        let errorsHTML = [`
+             <div class="alert alert-danger">
+                Something went wrong. Please try again.
+            </div>   
+        `];
+
+        const { errors }  = errorsJSON;
+   
+        if (errors && Array.isArray(errors)) {
+         errorsHTML = errors.map( err => `
+            <div class="alert alert-danger">
+                ${err}
+            </div>
+            `);
+        };
+
+        errorsContainer.innerHTML = errorsHTML.join("");
+
+    } else {
+        alert('Something went wrong. Check internety connection and try again.');
+    }
+};
+
+
+
+
+//--
+async function displayBarChart() {
   //1
   const canvas1 = document.querySelector('#canvas1');
   canvas1.innerHTML= `<canvas id="myChart1" width="1600" height="900"></canvas>`;
@@ -59,152 +292,6 @@ document.addEventListener('DOMContentLoaded', async (e) => {
     }
 
   });
-   
-  //2
-  const canvas = document.querySelector('#canvas');
-  canvas.innerHTML = `<canvas id="myChart" width="1600" height="900"></canvas>`;
-
-// Our labels along the x-axis
-  var years = [1500,1600,1700,1750,1800,1850,1900,1950,1999,2050];
-  // For drawing the lines
-  var africa = [86,114,106,106,107,111,133,221,783,2478];
-  var asia = [282,350,411,502,635,809,947,1402,3700,5267];
-  var europe = [168,170,178,190,203,276,408,547,675,734];
-  var latinAmerica = [40,20,10,16,24,38,74,167,508,784];
-  var northAmerica = [6,3,2,2,7,26,82,172,312,433];
-
-  var ctx = document.getElementById("myChart");
-  var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: years,
-      datasets: [
-       { 
-         data: africa,
-         label: "Africa",
-         borderColor: "#3e95cd",
-         fill: false
-      },
-
-      { 
-       data: asia,
-       label: "Asia",
-       borderColor: "red",
-       fill: false
-     },
-
-     { 
-       data: europe,
-       label: "Europe",
-       borderColor: "#3e95cd",
-       fill: false
-     },
-
-     { 
-       data: latinAmerica,
-       label: "Latin America",
-       borderColor: "#3e95cd",
-       fill: false
-     },
-
-     { 
-       data: northAmerica,
-       label: "North America",
-       borderColor: "#3e95cd",
-       fill: false
-     }
-    ]
-  }
-});
-
-});
-
-
-async function displayTableTotalGeneral() {
-
-
-  try {
-      
-      const res = await fetch('http://localhost:8081/analytics/users/1/info', {
-           method: "GET",
-           headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-           }
-      });
-
-      if(res.status === 401) {
-        window.location.href = '/login';
-        return;
-      };
-
-      const { stocks } = await res.json();
- 
-
-      const tableConatiner = document.querySelector('.table-container');
-  
-      
-      const tableRows = results.map ( ({name, TotalTransitStock, TotalTransitSum, action}) => 
-         ` <tr> 
-             <td> ${name} </td>
-             <td> ${TotalTransitStock} </td>
-             <td> ${TotalTransitSum} </td>
-             <td> ${action} </td>
-            </tr>  
-         `
-      );
-    
-
-       const tableHTML = 
-       `<table class="table table-striped table-hover">
-          <thead class="thead-dark">
-            <tr>
-             <th> Stock </th>
-             <th> Buy - TotalTransitStock </th> 
-             <th> Sell - TotalTransitStock </th>
-             <th> Active - No Stock </th>
-             <th> Buy -Total Value Stock </th> 
-             <th> Sell -Total Value Stock </th> 
-             <th> Active - Total Value Stock </th>
-            </tr> 
-          </thead>`  
-             + tableRows.join (' ')
-        +'</tbody>'+
-        +'</table>';
-      
-
-      tableConatiner.innerHTML = tableHTML;
-
-  } catch (err) {
-     handleError();
-  }
 }
 
-
-async function handleError(err) {
-   if (err.status >= 400 && err.status < 600) {
-
-        const errorsJSON = await err.json();
-        let errorsContainer = document.querySelector('.errors-container');
-        let errorsHTML = [`
-             <div class="alert alert-danger">
-                Something went wrong. Please try again.
-            </div>   
-        `];
-
-        const { errors }  = errorsJSON;
-       
-        if (errors && Array.isArray(errors)) {
-         errorsHTML = errors.map( err => `
-            <div class="alert alert-danger">
-                ${err}
-            </div>
-            `);
-        };
-
-        errorsContainer.innerHTML = errorsHTML.join("");
-
-    } else {
-        alert('Something went wrong. Check internety connection and try again.');
-    }
-}
+//------
