@@ -11,7 +11,9 @@ const router = express.Router();
 router.use(requireAuth);
 
 router.get('/', asyncHandler(async (req, res) => {
-  const stocks = await db.Stock.findAll() ;
+  const stocks = await db.Stock.findAll({
+    order: [["name", "ASC"]]
+  }) ;
   res.json({stocks});
 }));
 

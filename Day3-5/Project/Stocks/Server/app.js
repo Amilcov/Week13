@@ -5,6 +5,7 @@ const cors = require('cors');
 const users = require('./routes/users');
 const stockRoutes = require('./routes/stock');
 const transactions = require('./routes/transactions');
+const analytics = require('./routes/analytics');
 const { environment } = require('./config'); 
 
 const app = express();
@@ -15,7 +16,10 @@ app.use(cors());
 
 app.use('/users', users);
 app.use('/stock', stockRoutes);
+app.use('/analytics', analytics);
 app.use('/', transactions);
+
+
 
 const isProduction = environment === 'production';
 

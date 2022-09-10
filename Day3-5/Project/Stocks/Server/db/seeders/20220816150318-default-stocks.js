@@ -14,15 +14,14 @@ module.exports = {
    await queryInterface.bulkInsert('Stocks', [
     
    {
-      name: 'Twitter',
-      symbol: "TWTR",
-      "yearListed": 2013,
-      "marketShares": '765.25 M',
-      "marketValue": '33.87 T',
-      info: "Year listed IPO: 6 November 2013",
+      name: 'Google',
+      symbol: "GOOG",
+      "yearListed": 2004,
+      "marketShares": '14.462 B',
+      "marketValue": '1.451 T',
+      info: "Year listed IPO: 14 Auguest 2004",
       createdAt: new Date(),
       updatedAt: new Date()
-
    },
 
 
