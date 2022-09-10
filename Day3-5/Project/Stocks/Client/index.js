@@ -94,6 +94,13 @@ app.use('/login',(req, res) => {
     return res.render('login', {"title": "Login"});
 });
 
+app.use('/analytic', (req, res) => {
+    return res.render('analytic', {"title": "Analytics"});
+    //return res.render('analytic-test', {"title": "Analytics"});
+    //return res.render('analytic-learn', {"title": "Analytics"});
+});
+
+
 app.use('/', (req, res) => { 
     return res.render('login', {"title": "Login"});
 });
