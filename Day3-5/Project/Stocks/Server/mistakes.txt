@@ -123,3 +123,10 @@ OK:  (req, res, next)
 
  OK: label (for='x')
 !OK: label (name='x')
+
+
+
+19.
+
+ OK: n.toLocaleString('en-US');
+!OK: n.toLocalString('en-US');
