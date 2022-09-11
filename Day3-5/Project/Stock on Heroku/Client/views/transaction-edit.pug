@@ -1,0 +1,51 @@
+extends layout.pug
+block content 
+  .errors-container
+  #date.d-none
+    p#transactionId= transactionId
+    p#stockId= stockId
+  form.edit-form 
+    .form-group
+      label(for="stockId") Stock: 
+      select.form-control#optionStocks(name="stockId" required)
+    .form-group 
+      label(for="action") Action: 
+      select.form-control(name="action" required)
+        option 
+        option(value='Buy') Buy
+        option(value='Sell') Sell 
+        option(value='Dividend') Dividend
+
+    .form 
+      .row  
+        .col: label #Shares:
+        .col: label Price:
+        .col: label Exchanged ( #Shares x Price ):
+      .row  
+        .col: input.form-control.dataIn(type="number" step="0.01" name="noShares" required)
+        .col: input.form-control.dataIn(type="number" step="0.01" name="price" required)
+        .col: input.form-control.dataOut(type="number" step="0.01" name="exchanged" required)
+          
+    .form-group
+      label(for="fee") Fee: 
+      input.form-control.dataOut(type="number" step="0.01" name="fee" required)
+    .form-group
+      label(for="totalCredit") Total Credit ( Exchanged - Fee ): 
+      input.form-control(type="number" step="0.01" name="totalCredit" required) 
+
+    .form-group
+      label(for="date") Date: 
+      input.mr-2#date(type="date" name="date" required) 
+
+      label(for="time") Time: 
+      input#time(type="time" name="time" required)   
+
+    button.btn.btn-primary(type="submit") Update Transaction  
+    a.btn.btn-warning.ml-2#cancelButton(href='/transaction') Cancel  
+  script(src="/js/transaction-edit.js")   
+
+
+
+
+
+        

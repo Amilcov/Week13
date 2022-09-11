@@ -1,0 +1,22 @@
+extends layout.pug 
+block content 
+  .signup-container
+    div.errors-container 
+    form.signup-form
+      div.form-group
+        div.form-group
+          label(for="firstname") First Name: 
+          input.form-control#firstname(type="text" name="firstname" placeholder="First Name")
+        div.form-group
+          label(for="lastname") Last Name: 
+          input.form-control#lastname(type="text" name="lastname" placeholder="Last Name")
+        div.form-group
+          label(for="username") Username: 
+          input.form-control#username(type="text" name="username" placeholder="Username")
+        include auth-form-fields.pug  
+
+        button.btn.btn-primary.mr-2(type='submit') Register 
+      a.btn.btn-warning(href='/') Already have an account? Login here
+    script(src="/js/signup.js")   
+
+

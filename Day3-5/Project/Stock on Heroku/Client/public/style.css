@@ -1,0 +1,19 @@
+body {
+    padding: 40px;
+}
+
+.bold {
+   font-weight: bold;
+}
+
+.buy {
+    color: rgb(81, 119, 79);
+}
+.sell {
+    color: blueviolet;
+}
+
+.dividend {
+    color:rgb(15, 237, 226)
+}
+

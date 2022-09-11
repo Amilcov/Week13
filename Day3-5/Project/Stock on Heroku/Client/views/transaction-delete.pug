@@ -1,0 +1,13 @@
+extends layout.pug
+
+block content
+  #date.d-none
+    p#transactionId= transactionId
+    p#stockId= stockId
+  h3#stockName
+  div.errors-container 
+  div.transaction-container 
+  div(class='py-4')
+    p Proceed with deleting this transaction?
+  div#buttons
+  script(src="/js/transaction-delete.js")    

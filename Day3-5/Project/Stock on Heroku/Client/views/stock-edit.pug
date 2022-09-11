@@ -1,0 +1,26 @@
+extends layout.pug 
+block content
+  .errors-container 
+  form.edit-form
+    .form-group 
+      label(for="symbol") Symbol: 
+      input.form-control#symbol(type="text" name="symbol" placeholder="Symbol Stock")
+    .form-group 
+      label(for="name") Stock: 
+      input.form-control#name(type="text" name="name" placeholder="Symbol Stock")   
+    .form-group 
+      label(for="yearListed") Year Listed: 
+      input.form-control#yearListed(type="number" name="yearListed" placeholder="Listed Year Stock")   
+    .form-group 
+      label(for="marketShares") Market Shares: 
+      input.form-control#marketShares(type="text" name="marketShares" placeholder="Market Shares") 
+    .form-group 
+      label(for="marketValue") Market Capitalization: 
+      input.form-control#marketValue(type="text" name="marketValue" placeholder="Market Value") 
+    .form-group 
+      label(for="info") Info 
+      input.form-control#info(type="text" name="info" placeholder="info") 
+    button.btn.btn-primary(type="submit") Update Stock
+    a.btn.btn-warning.ml-2(href=`/stock/${stockId}`) Cancel
+    p.d-none#stockId= stockId  
+  script(src="/js/stock-edit.js")  

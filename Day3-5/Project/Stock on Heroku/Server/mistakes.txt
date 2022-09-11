@@ -1,0 +1,132 @@
+1. 
+
+   OK: seeders-path
+  !OK: seeder-path
+
+         context: .sequelizer
+
+2. 
+
+   OK: path.resolve('db', 'migrations')
+  !OK: path.resolve('db', 'migrations')
+
+         context: .sequelizer
+               ..
+                migrations-path: path.resolve('db', 'migrations')
+
+
+3. 
+ OK:  generate:migration
+!OK:  generate:migrations     
+     context: npx dotenv sequelize-cli generate:migrate
+     
+4.
+   OK: npx sequelize-cli seed:generate --name default-users 
+  !OK: npx dotenv sequelize-cli seed:generate --name default-users 
+         
+5.  
+ OK:  return await queryInterface.bulkInsert/Delete....
+!OK:  await queryInterface.bulkInsert/Delete.
+       ERROR: column "username" of relation "Users" does not exist
+
+       CONTEXT: in seed file
+
+6. 
+
+   OK: link
+  !OK: meta
+
+      context: html <link rel="stylesheet" type="text/css" href=".."/>
+
+7. 
+     OK: href='...'
+   ! OK: link='...' 
+       context: 6.
+
+ 
+8.
+
+ OK:  link(rel="stylesheet" href='' integrity='' crossorigin='anonymous')
+!OK:  link(href='' integrity='' crossorigin='anonymous')
+
+9.
+OK: a.navbar-brand(href='/') Stocks
+!OK: a.navbar-brand( href='/') Stocks
+
+ 
+ 10.
+
+  OK: app.use(express.json());
+ !OK: -
+
+     context: in server -> app.js
+     pt a putea citi json ul trimit de client
+   
+11.
+
+  OK: res.ok 
+ !OK: res.OK
+     CONTEXT:  const res = await fetch('http://localhost:8081/users', {...})
+               if(!res.ok) 
+
+
+ 12.
+   OK: "yearListed": 1900
+  !OK:  yearListed: 1900    
+      CONTEXT: In seerd files when importing seeds files
+        ERROR: column "yearlisted" of relation "Stocks" does not exist
+
+
+13.
+
+ OK:  const userId = parseInt(req.params.userId, 10);
+!OK:  const userId = parseInt(req.body.userId, 10);
+
+    context:  router.get('/user/:userId(\\d+)/transactions'
+
+
+
+14.
+
+    OK: order: [['date', "Desc"], ['time', "Desc"]]
+   !OK: order: [[date, "Desc"], [time, "Desc"]]  
+
+      context: 
+             const transactions = await db.Transaction.findAll(  { 
+                 where: {userId: userId},
+                 include: ['stock'],
+                  order: [['date', "Desc"], ['time', "Desc"]]
+              });
+
+
+
+15.  
+
+ OK: npx sequelize-cli model:generate --name Fund --attributes value:number,date:dateonly,time:time 
+!OK: npx dotenv  sequelize-cli model:generate --name Fund --attributes value:number,date:dateonly,time:time 
+
+
+16.
+
+OK:  (req, res, next)
+!OK: (req, res)
+
+    context: validationErrors - Orice validatre de errori se face cu next
+
+17.
+
+ OK:    script(src="/js/transaction-add.js")   
+!OK:   script(src="js/transaction-add.js")   
+
+
+18.
+
+ OK: label (for='x')
+!OK: label (name='x')
+
+
+
+19.
+
+ OK: n.toLocaleString('en-US');
+!OK: n.toLocalString('en-US');

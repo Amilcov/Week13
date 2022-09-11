@@ -1,0 +1,9 @@
+extends layout.pug
+block content 
+  div.login-container
+    div.errors-container 
+    form.login-form
+        include auth-form-fields.pug
+        button.btn.btn-primary.mr-2(type="submit") Login
+        a.btn.btn-warning(href='/register') Don't have an account? Register here.
+    script(src='js/login.js') 
